@@ -1,6 +1,6 @@
 import pw from "../model/pw.js";
 import express from "express";
-import { product } from "../model/pw.js";
+import { product, productsTestDevelopment } from "../model/pw.js";
 
 const router = express.Router();
 
@@ -40,7 +40,7 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.post("/createProduct", async (req, res) => {
+router.post("/create, ", async (req, res) => {
   try {
     const { name, sku } = req.body;
 
@@ -65,7 +65,12 @@ router.get("/getProducts", async (req, res) => {
     if (req.query.download === "false") {
       filter.download = false;
     }
-    const products = await product.find(filter).limit(10);
+
+    if (req.query.error === "null") {
+      filter.$or = [{ error: null }, { error: "" }];
+    }
+
+    const products = await product.find(filter).limit(1);
 
     if (!products || products.length === 0) {
       return res.status(404).json({ error: "No products found" });
@@ -83,6 +88,51 @@ router.patch("/updateProduct/:id", async (req, res) => {
     const { download, error } = req.body;
 
     const updatedProduct = await product.findByIdAndUpdate(
+      id,
+      { ...(download !== undefined && { download }), ...(error && { error }) },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/productsTestDevelopment", async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.download === "false") {
+      filter.download = false;
+    }
+
+    if (req.query.error === "null") {
+      filter.$or = [{ error: null }, { error: "" }];
+    }
+
+    const products = await productsTestDevelopment.find(filter).limit(30);
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({ error: "No products found" });
+    }
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.patch("/productsTestDevelopment/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { download, error } = req.body;
+
+    const updatedProduct = await productsTestDevelopment.findByIdAndUpdate(
       id,
       { ...(download !== undefined && { download }), ...(error && { error }) },
       { new: true }
