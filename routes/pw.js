@@ -61,13 +61,40 @@ router.post("/createProduct", async (req, res) => {
 
 router.get("/getProducts", async (req, res) => {
   try {
-    const products = await product.find().limit(5);
+    const filter = {};
+    if (req.query.download === "false") {
+      filter.download = false;
+    }
+    const products = await product.find(filter).limit(10);
+
     if (!products || products.length === 0) {
       return res.status(404).json({ error: "No products found" });
     }
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.patch("/updateProduct/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { download, error } = req.body;
+
+    const updatedProduct = await product.findByIdAndUpdate(
+      id,
+      { ...(download !== undefined && { download }), ...(error && { error }) },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error("Error updating product:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
