@@ -1,8 +1,9 @@
 import { BrowserContext, Page, test, Browser } from "@playwright/test";
-import products from "../products";
+// import products from "../products";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import axios from "axios";
 
 test.setTimeout(0);
 
@@ -74,6 +75,11 @@ async function safeNewContext(
 
 const errorProducts: any = [];
 
+const responce = await axios.get("http://localhost:8000/api/pw/getProducts");
+const products = responce.data;
+
+console.log("products", products);
+
 async function processProduct(
   item: any,
   index: number,
@@ -86,14 +92,14 @@ async function processProduct(
     try {
       await currentContext.close();
     } catch {}
-    currentContext = await safeNewContext(browser) as BrowserContext;
+    currentContext = (await safeNewContext(browser)) as BrowserContext;
   }
-  if (item.download) {
-    console.log(
-      `🟡 Skipping (${index + 1}/${products.length}): ${item.formatSplicedName}`
-    );
-    return currentContext;
-  }
+  // if (item.download) {
+  //   console.log(
+  //     `🟡 Skipping (${index + 1}/${products.length}): ${item.formatSplicedName}`
+  //   );
+  //   return currentContext;
+  // }
 
   const page = await createSafePage(currentContext);
   if (!page) {
@@ -117,7 +123,9 @@ async function processProduct(
     await safeGoto(page, "https://quest3plus.bpfk.gov.my/pmo2/index.php");
 
     console.log(
-      `🔄 (${index + 1}/${products.length}) Processing: ${item.formatSplicedName}`
+      `🔄 (${index + 1}/${products.length}) Processing: ${
+        item.formatSplicedName
+      }`
     );
 
     // Select search by Product Name
@@ -175,7 +183,9 @@ async function processProduct(
 
     if (outcome === "noResults") {
       console.log(
-        `⚠️ No results found for (${index + 1}/${products.length}): ${item.formatSplicedName}`
+        `⚠️ No results found for (${index + 1}/${products.length}): ${
+          item.formatSplicedName
+        }`
       );
       const catchProduct = {
         name: item.name,
@@ -183,7 +193,9 @@ async function processProduct(
       };
       errorProducts.push({
         ...catchProduct,
-        error: `⚠️ No results found for (${index + 1}/${products.length}): ${item.formatSplicedName}`,
+        error: `⚠️ No results found for (${index + 1}/${products.length}): ${
+          item.formatSplicedName
+        }`,
       });
       await page.close();
       return currentContext;
@@ -191,26 +203,24 @@ async function processProduct(
 
     const page2Promise = Promise.race([
       page.waitForEvent("popup"),
-      new Promise(
-        (_, reject) =>
-          setTimeout(
-            () => reject(new Error("❌ Timeout: popup did not open in time")),
-            10000
-          )
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("❌ Timeout: popup did not open in time")),
+          10000
+        )
       ),
     ]);
 
     const clickPromise = Promise.race([
       resultLocator.click(),
-      new Promise(
-        (_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error("❌ Timeout: resultLocator.click() took too long")
-              ),
-            10000
-          )
+      new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error("❌ Timeout: resultLocator.click() took too long")
+            ),
+          10000
+        )
       ),
     ]);
 
@@ -300,15 +310,31 @@ async function processProduct(
     }
 
     if (d4Links.length === 0) {
-      console.log(`⚠️ No D4 PDFs found for ${item.formatSplicedName}`);
-      errorProducts.push({
-        name: item.name,
-        sku: item.sku,
-        error: `⚠️ No D4 PDFs found for ${item.formatSplicedName}`,
-      });
-      await page2.close();
-      await page.close();
-      return currentContext;
+      try {
+        await axios.patch(
+          `http://localhost:8000/api/pw/updateProduct/${item._id}`,
+          {
+            download: false, // to patch the download
+            error: "D4FileNotFound!",
+          }
+        );
+        console.log(`⚠️ 112 D4 PDFs found for ${item.formatSplicedName}`);
+        errorProducts.push({
+          name: item.name,
+          sku: item.sku,
+          error: `⚠️ No D4 PDFs found for ${item.formatSplicedName}`,
+        });
+        await page2.close();
+        await page.close();
+        return currentContext;
+      } catch (err) {
+        console.error(`❌ Failed to update DB for ${item.name}`, err);
+        errorProducts.push({
+          name: item.name,
+          sku: item.sku,
+          error: `❌ Failed to update DB for ${item.name}`,
+        });
+      }
     }
 
     // Try to find D4 + ENG/eng/Eng or PIL
@@ -396,15 +422,25 @@ async function processProduct(
       // fs.mkdirSync(folderPath, { recursive: true });
 
       const fullPath = path.join(folderPath, safeFileName);
-      await download.saveAs(fullPath);
+      // await download.saveAs(fullPath);
+
+      try {
+        await axios.patch(
+          `http://localhost:8000/api/pw/updateProduct/${item._id}`,
+          {
+            download: false, // to patch the download
+          }
+        );
+        console.log(`✅ Updated DB for ${item.name}`);
+      } catch (err) {
+        console.error(`❌ Failed to update DB for ${item.name}`, err);
+      }
 
       console.log(`📥 Saved to: ${fullPath}`);
 
       if (page3) await page3.close();
     } catch (err: any) {
-      console.warn(
-        `⚠️ D4 PDF download failed for ${item.formatSplicedName}`
-      );
+      console.warn(`⚠️ D4 PDF download failed for ${item.formatSplicedName}`);
       errorProducts.push({
         name: item.name,
         sku: item.sku,
@@ -417,12 +453,16 @@ async function processProduct(
     await new Promise((res) => setTimeout(res, 300));
 
     console.log(
-      `✅ Completed (${index + 1}/${products.length}): ${item.formatSplicedName}`
+      `✅ Completed (${index + 1}/${products.length}): ${
+        item.formatSplicedName
+      }`
     );
     // --- End main logic block ---
   } catch (error) {
     console.error(
-      `❌ Error (${index + 1}/${products.length}) on ${item.formatSplicedName}:`,
+      `❌ Error (${index + 1}/${products.length}) on ${
+        item.formatSplicedName
+      }:`,
       error
     );
     const catchProduct = {
@@ -431,7 +471,9 @@ async function processProduct(
     };
     errorProducts.push({
       ...catchProduct,
-      error: `❌ Error (${index + 1}/${products.length}) on ${item.formatSplicedName}:`,
+      error: `❌ Error (${index + 1}/${products.length}) on ${
+        item.formatSplicedName
+      }:`,
     });
   }
   return currentContext;
@@ -459,7 +501,7 @@ test("download product PDFs", async ({ browser, context }) => {
       await currentContext.close();
       await new Promise((r) => setTimeout(r, 2000));
     } catch {}
-    currentContext = await safeNewContext(browser) as BrowserContext;
+    currentContext = (await safeNewContext(browser)) as BrowserContext;
   }
   console.log("errorProducts", errorProducts);
 });

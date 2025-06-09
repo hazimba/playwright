@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A frontend application to connect with the existing backend and database.",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

@@ -42,5 +42,9 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  error: {
+    type: String,
+    default: null,
+  },
 });
 export const product = mongoose.model("product", productSchema);
