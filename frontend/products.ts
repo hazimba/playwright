@@ -204,54 +204,54 @@ const product = [
         "__v": 0
     },
     // comment
-    {
-        "_id": "6841c3f102dd382bb9d07773",
-        "name": "ACETAN 50MG",
-        "formattedName": "ACETAN",
-        "formatSplicedName": "ACETAN",
-        "splicedName": "ACETAN 50MG",
-        "sku": "22311",
-        "exist": false,
-        "download": false,
-        "upload": false,
-        "__v": 0
-    },
-    {
-        "_id": "6841c3f102dd382bb9d07774",
-        "name": "Acetan HCT Tablet 100mg/25mg",
-        "formattedName": "Acetan HCT Tablet",
-        "formatSplicedName": "Acetan HCT",
-        "splicedName": "Acetan HCT Tablet",
-        "sku": "37498",
-        "exist": false,
-        "download": false,
-        "upload": false,
-        "__v": 0
-    },
-    {
-        "_id": "6841c3f102dd382bb9d07775",
-        "name": "Acetan HCT Tablet 50/12.5mg",
-        "formattedName": "Acetan HCT Tablet 50/",
-        "formatSplicedName": "Acetan HCT Tablet",
-        "splicedName": "Acetan HCT Tablet",
-        "sku": "16687",
-        "exist": false,
-        "download": false,
-        "upload": false,
-        "__v": 0
-    },
-    {
-        "_id": "6841c3f102dd382bb9d07776",
-        "name": "ACETEC 20MG",
-        "formattedName": "ACETEC",
-        "formatSplicedName": "ACETEC",
-        "splicedName": "ACETEC 20MG",
-        "sku": "16688",
-        "exist": false,
-        "download": false,
-        "upload": false,
-        "__v": 0
-    },
+    // {
+    //     "_id": "6841c3f102dd382bb9d07773",
+    //     "name": "ACETAN 50MG",
+    //     "formattedName": "ACETAN",
+    //     "formatSplicedName": "ACETAN",
+    //     "splicedName": "ACETAN 50MG",
+    //     "sku": "22311",
+    //     "exist": false,
+    //     "download": false,
+    //     "upload": false,
+    //     "__v": 0
+    // },
+    // {
+    //     "_id": "6841c3f102dd382bb9d07774",
+    //     "name": "Acetan HCT Tablet 100mg/25mg",
+    //     "formattedName": "Acetan HCT Tablet",
+    //     "formatSplicedName": "Acetan HCT",
+    //     "splicedName": "Acetan HCT Tablet",
+    //     "sku": "37498",
+    //     "exist": false,
+    //     "download": false,
+    //     "upload": false,
+    //     "__v": 0
+    // },
+    // {
+    //     "_id": "6841c3f102dd382bb9d07775",
+    //     "name": "Acetan HCT Tablet 50/12.5mg",
+    //     "formattedName": "Acetan HCT Tablet 50/",
+    //     "formatSplicedName": "Acetan HCT Tablet",
+    //     "splicedName": "Acetan HCT Tablet",
+    //     "sku": "16687",
+    //     "exist": false,
+    //     "download": false,
+    //     "upload": false,
+    //     "__v": 0
+    // },
+    // {
+    //     "_id": "6841c3f102dd382bb9d07776",
+    //     "name": "ACETEC 20MG",
+    //     "formattedName": "ACETEC",
+    //     "formatSplicedName": "ACETEC",
+    //     "splicedName": "ACETEC 20MG",
+    //     "sku": "16688",
+    //     "exist": false,
+    //     "download": false,
+    //     "upload": false,
+    //     "__v": 0
+    // },
     // {
     //     "_id": "6841c3f102dd382bb9d07777",
     //     "name": "ACICLOVIR 200MG",
@@ -600,18 +600,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d07794",
-    //     "name": "AEVA MUROZIN OINTMENT 15G",
-    //     "formattedName": "AEVA MUROZIN OINTMENT",
-    //     "formatSplicedName": "AEVA MUROZIN",
-    //     "splicedName": "AEVA MUROZIN OINTMENT",
-    //     "sku": "16111",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d07794",
+        "name": "AEVAAA MUROZIN OINTMENT 15G",
+        "formattedName": "AEVA MUROZIN OINTMENT",
+        "formatSplicedName": "AEVAAA MUROZIN",
+        "splicedName": "AEVAAA MUROZIN OINTMENT",
+        "sku": "16111",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d07795",
     //     "name": "AFINITOR 10MG",
@@ -852,18 +852,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d077a9",
-    //     "name": "ALDARA PUMP 0.05 CREAM 2G",
-    //     "formattedName": "ALDARA PUMP 0.05 CREAM",
-    //     "formatSplicedName": "ALDARA PUMP 0.05",
-    //     "splicedName": "ALDARA PUMP 0.05",
-    //     "sku": "33492",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d077a9",
+        "name": "ALDARA PUMP 0.05 CREAM 2G",
+        "formattedName": "ALDARA PUMP 0.05 CREAM",
+        "formatSplicedName": "ALDARA PUMP 0.05",
+        "splicedName": "ALDARA PUMP 0.05",
+        "sku": "33492",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d077aa",
     //     "name": "ALEMBIC ERICOX 120MG",
@@ -2268,18 +2268,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d0781f",
-    //     "name": "APREZO STARTER PACK",
-    //     "formattedName": "APREZO STARTER PACK",
-    //     "formatSplicedName": "APREZO STARTER",
-    //     "splicedName": "APREZO STARTER",
-    //     "sku": "19535",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d0781f",
+        "name": "APREZO STARTER PACK",
+        "formattedName": "APREZO STARTER PACK",
+        "formatSplicedName": "APREZO STARTER",
+        "splicedName": "APREZO STARTER",
+        "sku": "19535",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d07820",
     //     "name": "APROVASC 150/10MG",
@@ -3492,18 +3492,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d07885",
-    //     "name": "AZOPT 0.01 OPTH SUSPENSION EYE DROP 5ML",
-    //     "formattedName": "AZOPT 0.01 OPTH SUSPENSION EYE DROP",
-    //     "formatSplicedName": "AZOPT 0.01 OPTH",
-    //     "splicedName": "AZOPT 0.01 OPTH",
-    //     "sku": "43355",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d07885",
+        "name": "AZOPT 0.01 OPTH SUSPENSION EYE DROP 5ML",
+        "formattedName": "AZOPT 0.01 OPTH SUSPENSION EYE DROP",
+        "formatSplicedName": "AZOPT 0.01 OPTH",
+        "splicedName": "AZOPT 0.01 OPTH",
+        "sku": "43355",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d07886",
     //     "name": "AZOREN 20MG/5MG",
@@ -3684,18 +3684,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d07895",
-    //     "name": "BECLATE-100 INHALER 200 METERED DOSES",
-    //     "formattedName": "BECLATE-100 INHALER 200 METERED DOSES",
-    //     "formatSplicedName": "BECLATE-100 INHALER 200",
-    //     "splicedName": "BECLATE-100 INHALER 200",
-    //     "sku": "18083",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d07895",
+        "name": "BECLATE-100 INHALER 200 METERED DOSES",
+        "formattedName": "BECLATE-100 INHALER 200 METERED DOSES",
+        "formatSplicedName": "BECLATE-100 INHALER 200",
+        "splicedName": "BECLATE-100 INHALER 200",
+        "sku": "18083",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d07896",
     //     "name": "BECLOMET NASAL AQUA 50MG",
@@ -4104,18 +4104,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d078b8",
-    //     "name": "BEZARTAN IRBESARTAN 300MG",
-    //     "formattedName": "BEZARTAN IRBESARTAN",
-    //     "formatSplicedName": "BEZARTAN IRBESARTAN",
-    //     "splicedName": "BEZARTAN IRBESARTAN",
-    //     "sku": "22929",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d078b8",
+        "name": "BEZARTAN IRBESARTAN 300MG",
+        "formattedName": "BEZARTAN IRBESARTAN",
+        "formatSplicedName": "BEZARTAN IRBESARTAN",
+        "splicedName": "BEZARTAN IRBESARTAN",
+        "sku": "22929",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d078b9",
     //     "name": "BEZARTAN IRBESARTAN 300MG 3 X",
@@ -4260,18 +4260,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d078c5",
-    //     "name": "BIOMOL INHALERS MDI 200 METERED DOSE 100MCG",
-    //     "formattedName": "BIOMOL INHALERS MDI 200 METERED DOSE",
-    //     "formatSplicedName": "BIOMOL INHALERS MDI",
-    //     "splicedName": "BIOMOL INHALERS MDI",
-    //     "sku": "31562",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d078c5",
+        "name": "BIOMOL INHALERS MDI 200 METERED DOSE 100MCG",
+        "formattedName": "BIOMOL INHALERS MDI 200 METERED DOSE",
+        "formatSplicedName": "BIOMOL INHALERS MDI",
+        "splicedName": "BIOMOL INHALERS MDI",
+        "sku": "31562",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d078c6",
     //     "name": "BIOSONE 100MCG/DOSE INHALER",
@@ -4416,18 +4416,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d078d2",
-    //     "name": "BRAUN GLUCOSE INTRAVENOUS INFUSION G-5% 500ML",
-    //     "formattedName": "BRAUN GLUCOSE INTRAVENOUS INFUSION G-5%",
-    //     "formatSplicedName": "BRAUN GLUCOSE INTRAVENOUS",
-    //     "splicedName": "BRAUN GLUCOSE INTRAVENOUS",
-    //     "sku": "37276",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d078d2",
+        "name": "BRAUN GLUCOSE INTRAVENOUS INFUSION G-5% 500ML",
+        "formattedName": "BRAUN GLUCOSE INTRAVENOUS INFUSION G-5%",
+        "formatSplicedName": "BRAUN GLUCOSE INTRAVENOUS",
+        "splicedName": "BRAUN GLUCOSE INTRAVENOUS",
+        "sku": "37276",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d078d3",
     //     "name": "BRAUN SODIUM CHLORIDE 0.009 100ML",
@@ -8868,18 +8868,18 @@ const product = [
     //     "upload": false,
     //     "__v": 0
     // },
-    // {
-    //     "_id": "6841c3f102dd382bb9d07a45",
-    //     "name": "EGO AZCLEAR MEDICATED LOTION 25G",
-    //     "formattedName": "EGO AZCLEAR MEDICATED LOTION",
-    //     "formatSplicedName": "EGO AZCLEAR MEDICATED",
-    //     "splicedName": "EGO AZCLEAR MEDICATED",
-    //     "sku": "45055",
-    //     "exist": false,
-    //     "download": false,
-    //     "upload": false,
-    //     "__v": 0
-    // },
+    {
+        "_id": "6841c3f102dd382bb9d07a45",
+        "name": "EGO AZCLEAR MEDICATED LOTION 25G",
+        "formattedName": "EGO AZCLEAR MEDICATED LOTION",
+        "formatSplicedName": "EGO AZCLEAR MEDICATED",
+        "splicedName": "EGO AZCLEAR MEDICATED",
+        "sku": "45055",
+        "exist": false,
+        "download": false,
+        "upload": false,
+        "__v": 0
+    },
     // {
     //     "_id": "6841c3f102dd382bb9d07a46",
     //     "name": "ELASTA 60MG",

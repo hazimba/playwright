@@ -9,6 +9,7 @@ dotenv.config()
  */
 export default defineConfig({
   timeout: 35000, // 35 seconds
+  
 
   testDir: '.frontend/tests',
   /* Run tests in files in parallel */
@@ -25,7 +26,10 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     viewport: { width: 1280, height: 720 }, // standard viewport for Swift's laptop
-
+headless: false, // Run in headed mode
+    launchOptions: {
+      args: ['--start-maximized'],
+    },
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: config.playWright.baseUrl,
 

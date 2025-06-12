@@ -5,6 +5,11 @@ import path from "path";
 import os from "os";
 import axios from "axios";
 
+const responce = await axios.get("http://localhost:8000/api/pw/productsTestDevelopment?download=false&error=null");
+const products = responce.data;
+
+console.log("products", products);
+
 test.setTimeout(0);
 
 async function createSafePage(
@@ -73,12 +78,35 @@ async function safeNewContext(
   return null;
 }
 
+async function patchData(
+  item: any,
+  download: boolean,
+  error?: string
+): Promise<void> {
+  try {
+    await axios.patch(`http://localhost:8000/api/pw/productsTestDevelopment/${item._id}`, {
+      download: download, // to patch the download
+      error,
+    });
+    console.log(`✅ Updated DB for ${item.name}`);
+  } catch (err) {
+    console.error(`❌ Failed to update DB for ${item.name}`, err);
+  }
+}
+
+const catchProductError = (item: any, errorMessage: string) => {
+  const catchProduct = {
+    name: item.name,
+    sku: item.sku,
+  };
+  console.error(`⚠️ Error for ${item.formatSplicedName}: ${errorMessage}`);
+  errorProducts.push({
+    ...catchProduct,
+    error: `⚠️ Error for ${item.formatSplicedName}: ${errorMessage}`,
+  });
+};
+
 const errorProducts: any = [];
-
-const responce = await axios.get("http://localhost:8000/api/pw/getProducts");
-const products = responce.data;
-
-console.log("products", products);
 
 async function processProduct(
   item: any,
@@ -94,12 +122,12 @@ async function processProduct(
     } catch {}
     currentContext = (await safeNewContext(browser)) as BrowserContext;
   }
-  // if (item.download) {
-  //   console.log(
-  //     `🟡 Skipping (${index + 1}/${products.length}): ${item.formatSplicedName}`
-  //   );
-  //   return currentContext;
-  // }
+  if (item.download || item.error) {
+    console.log(
+      `🟡 Skipping (${index + 1}/${products.length}): ${item.formatSplicedName}`
+    );
+    return currentContext;
+  }
 
   const page = await createSafePage(currentContext);
   if (!page) {
@@ -131,72 +159,81 @@ async function processProduct(
     // Select search by Product Name
     await page.locator("#searchBy").selectOption("1");
 
-    // Fill product name and search
-    try {
-      const input = page.getByRole("textbox", { name: /Please enter/i });
-      await input.waitFor({ timeout: 10000 });
-      await input.fill(item.formatSplicedName);
+    const nameParts = item.formatSplicedName.trim().split(/\s+/);
+    const triedNames = new Set<string>(); // Prevent duplicate searches
 
-      const searchButton = page.getByRole("button", { name: /search/i });
-      await searchButton.waitFor({ timeout: 10000 });
-      await searchButton.click({ timeout: 15000 });
-    } catch {
-      console.log(
-        `⚠️ Search form not available for: ${item.formatSplicedName}`
-      );
-      await page.close();
-      return currentContext;
-    }
+    const maxAttempts = nameParts.length > 1 ? 2 : 1;
+    let outcome: "noResults" | "result" | null = null;
 
-    // Wait for either "No results" or result grid cell
-    const noResultsLocator = page.locator("text=No results found, please");
-    const resultLocator = page.getByRole("gridcell", { name: /MAL/i }).first();
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      let searchName = "";
 
-    let outcome: "noResults" | "result" | null | any = null;
+      if (attempt === 0) {
+        // Prefer second word if it exists and is long enough
+        const second = nameParts[0];
+        if (second && second.length > 4) {
+          searchName = second;
+        } else {
+          searchName = nameParts[1];
+        }
+      } else {
+        // Fallback to first word if different
+        searchName = nameParts[1];
+      }
 
-    try {
-      outcome = await Promise.race([
-        Promise.race([
+      // Skip if already tried or too short
+      if (triedNames.has(searchName) || searchName.length <= 3) {
+        console.warn(
+          `⚠️ Skipping attempt ${
+            attempt + 1
+          }: "${searchName}" already tried or too short.`
+        );
+        continue;
+      }
+
+      triedNames.add(searchName);
+      console.log(`🔄 Attempt ${attempt + 1} using: "${searchName}"`);
+
+      try {
+        const input = page.getByRole("textbox", { name: /Please enter/i });
+        await input.waitFor({ timeout: 10000 });
+
+        // Reset input field properly
+        await input.fill(" ");
+        await input.press("Control+A");
+        await input.press("Backspace");
+        await input.fill(searchName);
+
+        const searchButton = page.getByRole("button", { name: /search/i });
+        await searchButton.waitFor({ timeout: 10000 });
+        await searchButton.click({ timeout: 15000 });
+
+        // Wait for result or "no results"
+        const noResultsLocator = page.locator("text=No results found, please");
+        const resultLocator = page
+          .getByRole("gridcell", { name: /MAL/i })
+          .first();
+        console.log(`🔄 Waiting for search results for "${searchName}"...`);
+        outcome = (await Promise.race([
           noResultsLocator
             .waitFor({ timeout: 50000 })
-            .then(() => "noResults")
+            .then(() => "noResults" as const)
             .catch(() => null),
           resultLocator
             .waitFor({ timeout: 50000 })
-            .then(() => "result")
+            .then(() => "result" as const)
             .catch(() => null),
-        ]),
-        new Promise<"timeout">((_, reject) =>
-          setTimeout(
-            () => reject(new Error("⏰ Search timed out after 3s")),
-            3000
-          )
-        ),
-      ]);
-    } catch (err) {
-      console.log(
-        `⏭️ Timed out waiting for result for: ${item.formatSplicedName}`
-      );
-      await page.close();
-      return currentContext;
+        ])) as "noResults" | "result" | null;
+
+        if (outcome === "result") break; // ✅ Done
+      } catch (err) {
+        console.error(`❌ Failed search for "${searchName}":`, err);
+      }
     }
 
-    if (outcome === "noResults") {
-      console.log(
-        `⚠️ No results found for (${index + 1}/${products.length}): ${
-          item.formatSplicedName
-        }`
-      );
-      const catchProduct = {
-        name: item.name,
-        sku: item.sku,
-      };
-      errorProducts.push({
-        ...catchProduct,
-        error: `⚠️ No results found for (${index + 1}/${products.length}): ${
-          item.formatSplicedName
-        }`,
-      });
+    // Final fallback
+    if (outcome !== "result") {
+      await patchData(item, false, "NotFoundByNameParts");
       await page.close();
       return currentContext;
     }
@@ -211,6 +248,7 @@ async function processProduct(
       ),
     ]);
 
+    const resultLocator = page.getByRole("gridcell", { name: /MAL/i }).first();
     const clickPromise = Promise.race([
       resultLocator.click(),
       new Promise((_, reject) =>
@@ -227,17 +265,10 @@ async function processProduct(
     try {
       await clickPromise;
     } catch (err: any) {
-      console.error(
+      catchProductError(
+        item,
         `❌ Click error for ${item.formatSplicedName}: ${err.message}`
       );
-      const catchProduct = {
-        name: item.name,
-        sku: item.sku,
-      };
-      errorProducts.push({
-        ...catchProduct,
-        error: `❌ Click error for ${item.formatSplicedName}: ${err.message}`,
-      });
       await page.close();
       return currentContext;
     }
@@ -260,7 +291,10 @@ async function processProduct(
     );
 
     if (!custMedication) {
-      console.log(`⚠️ No PDF files found for ${item.formatSplicedName}`);
+      console.log(
+        `⚠️ No PDF files/ Leaflet found for ${item.formatSplicedName}`
+      );
+      await patchData(item, false, "NoLeafletTableFound!");
       await page2.close();
       await page.close();
       return currentContext;
@@ -275,14 +309,11 @@ async function processProduct(
       await cellLocator.waitFor({ timeout: 10000 });
       await cellLocator.click();
     } catch (error: any) {
-      console.log(
-        `⚠️ Could not click cell[2] for ${item.formatSplicedName}: ${error.message}`
+      await patchData(item, false, "redo-FailedToClickCell!");
+      catchProductError(
+        item,
+        `❌ Failed to click cell for ${item.formatSplicedName}: ${error.message}`
       );
-      errorProducts.push({
-        name: item.name,
-        sku: item.sku,
-        error: `⚠️ Could not click cell[2] for ${item.formatSplicedName}: ${error.message}`,
-      });
       await page2.close();
       await page.close();
       return currentContext;
@@ -291,55 +322,21 @@ async function processProduct(
     // Get all PDF links
     const pdfLinks = await page2.locator('a[href$=".pdf"]').elementHandles();
     if (pdfLinks.length === 0) {
-      console.log(`⚠️ No PDF files found for ${item.formatSplicedName}`);
-      errorProducts.push({
-        name: item.name,
-        sku: item.sku,
-        error: `⚠️ No PDF files found for ${item.formatSplicedName}`,
-      });
+      catchProductError(
+        item,
+        `⚠️ No PDF files found for ${item.formatSplicedName}`
+      );
+      await patchData(item, false, "NoPDFFilesFound!");
       await page2.close();
       await page.close();
       return currentContext;
     }
 
     // Filter only D4 PDFs
-    const d4Links: typeof pdfLinks = [];
+    let selectedLink: (typeof pdfLinks)[0] | undefined;
+
+    // Prioritize links with "ENG" in name
     for (const link of pdfLinks) {
-      const text = (await link.textContent())?.toLowerCase() || "";
-      if (text.includes("d4")) d4Links.push(link);
-    }
-
-    if (d4Links.length === 0) {
-      try {
-        await axios.patch(
-          `http://localhost:8000/api/pw/updateProduct/${item._id}`,
-          {
-            download: false, // to patch the download
-            error: "D4FileNotFound!",
-          }
-        );
-        console.log(`⚠️ 112 D4 PDFs found for ${item.formatSplicedName}`);
-        errorProducts.push({
-          name: item.name,
-          sku: item.sku,
-          error: `⚠️ No D4 PDFs found for ${item.formatSplicedName}`,
-        });
-        await page2.close();
-        await page.close();
-        return currentContext;
-      } catch (err) {
-        console.error(`❌ Failed to update DB for ${item.name}`, err);
-        errorProducts.push({
-          name: item.name,
-          sku: item.sku,
-          error: `❌ Failed to update DB for ${item.name}`,
-        });
-      }
-    }
-
-    // Try to find D4 + ENG/eng/Eng or PIL
-    let selectedLink: (typeof d4Links)[0] | undefined;
-    for (const link of d4Links) {
       const text = (await link.textContent()) || "";
       if (/eng/i.test(text)) {
         selectedLink = link;
@@ -347,9 +344,9 @@ async function processProduct(
       }
     }
 
-    // If no ENG match, try for PIL
+    // If no "ENG", look for "PIL"
     if (!selectedLink) {
-      for (const link of d4Links) {
+      for (const link of pdfLinks) {
         const text = (await link.textContent()) || "";
         if (/pil/i.test(text)) {
           selectedLink = link;
@@ -358,18 +355,24 @@ async function processProduct(
       }
     }
 
+    // If no match at all, consider this a failure
     if (!selectedLink) {
-      console.log(
-        `⚠️ No suitable English D4 PDF found for ${item.formatSplicedName}`
-      );
-      errorProducts.push({
-        name: item.name,
-        sku: item.sku,
-        error: `⚠️ No suitable English D4 PDF found for ${item.formatSplicedName}`,
-      });
-      await page2.close();
-      await page.close();
-      return currentContext;
+      try {
+        await patchData(item, false, "EngOrPilFileNotFound!");
+        catchProductError(
+          item,
+          `⚠️ No ENG or PIL PDFs
+          await page.getByRole('gridcell', { name: 'Product Name: activate to' }).click(); found for ${item.formatSplicedName}`
+        );
+        await page2.close();
+        await page.close();
+        return currentContext;
+      } catch (err) {
+        catchProductError(
+          item,
+          `❌ Failed to update DB for ${item.formatSplicedName}: ${err.message}`
+        );
+      }
     }
 
     // Download the selected D4 PDF
@@ -396,16 +399,22 @@ async function processProduct(
         ),
       ]);
 
+      if(!downloadPromise) {
+        await patchData(item, false, "FailedToDownload!");
+        catchProductError(
+          item,
+          `❌ Failed to set up download or popup listeners for ${item.formatSplicedName}`
+        );
+        throw new Error("❌ Failed to set up download or popup listeners");
+      }
+
       await selectedLink.click();
       const page3 = await page3Promise.catch(() => null);
       const download = await downloadPromise;
       const linkText =
         (await selectedLink.textContent())?.trim() || "download.pdf";
 
-      const fileName = `${linkText}_${item.sku}.pdf`.replace(
-        /[\/\\:*?"<>|]/g,
-        "_"
-      );
+      const fileName = `${item.sku}_${linkText}`.replace(/[\/\\:*?"<>|]/g, "_");
       const safeFileName = fileName.replace(/[\/\\:*?"<>|]/g, "_");
 
       const downloadsDir = path.join(
@@ -419,19 +428,13 @@ async function processProduct(
       );
       const folderPath = path.join(downloadsDir, folderName);
 
-      // fs.mkdirSync(folderPath, { recursive: true });
+      fs.mkdirSync(folderPath, { recursive: true });
 
       const fullPath = path.join(folderPath, safeFileName);
-      // await download.saveAs(fullPath);
+      await download.saveAs(fullPath);
 
       try {
-        await axios.patch(
-          `http://localhost:8000/api/pw/updateProduct/${item._id}`,
-          {
-            download: false, // to patch the download
-          }
-        );
-        console.log(`✅ Updated DB for ${item.name}`);
+        await patchData(item, true);
       } catch (err) {
         console.error(`❌ Failed to update DB for ${item.name}`, err);
       }
@@ -459,22 +462,12 @@ async function processProduct(
     );
     // --- End main logic block ---
   } catch (error) {
-    console.error(
+    catchProductError(
+      item,
       `❌ Error (${index + 1}/${products.length}) on ${
         item.formatSplicedName
-      }:`,
-      error
+      }: ${error}`
     );
-    const catchProduct = {
-      name: item.name,
-      sku: item.sku,
-    };
-    errorProducts.push({
-      ...catchProduct,
-      error: `❌ Error (${index + 1}/${products.length}) on ${
-        item.formatSplicedName
-      }:`,
-    });
   }
   return currentContext;
 }

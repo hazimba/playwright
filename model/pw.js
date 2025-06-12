@@ -48,3 +48,44 @@ const productSchema = new mongoose.Schema({
   },
 });
 export const product = mongoose.model("product", productSchema);
+
+const productsTestEnvironment = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  formattedName: {
+    type: String,
+  },
+  formatSplicedName: {
+    type: String,
+  },
+  splicedName: {
+    type: String,
+  },
+  sku: {
+    type: String,
+    required: true,
+  },
+  exist: {
+    type: Boolean,
+    default: false,
+  },
+  download: {
+    type: Boolean,
+    default: false,
+  },
+  upload: {
+    type: Boolean,
+    default: false,
+  },
+  error: {
+    type: String,
+    default: null,
+  },
+});
+
+export const productsTestDevelopment = mongoose.model(
+  "productsTestDevelopment",
+  productsTestEnvironment
+);
